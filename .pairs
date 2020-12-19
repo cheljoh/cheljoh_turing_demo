@@ -1,0 +1,7 @@
+pairs:
+  cj: Chelsea Johnson
+email:
+  prefix: pair
+  domain: rxrevu.com
+  no_solo_prefix: true
+global: false  # Set to true for git-pair to change git configuration for all your projects
