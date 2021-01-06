@@ -33,7 +33,9 @@ class CatFoodFinder
   end
 
   def present_response(response)
-    response.to_h.to_json
+    {
+      message: "yay you did it!"
+    }.merge(response.to_h).to_json
   end
 
   def create_cat(parsed_json)

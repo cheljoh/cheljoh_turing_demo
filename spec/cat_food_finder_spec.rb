@@ -11,19 +11,20 @@ RSpec.describe CatFoodFinder do
       }.to_json
     end
 
-    context "json" do
-      context "valid json" do
-        it "parses the json" do
-          results = described_class.new(json).call
+    context "happy path" do
+      it "returns cat food recommendation" do
+        results = described_class.new(json).call
 
-          expect(results).to eq({
-            name: "Yummy Kitty Food",
-            days_supply: 30,
-            quantity: 3,
-          }.to_json)
-        end
+        expect(results).to eq({
+          message: "yay you did it!",
+          name: "Yummy Kitty Food",
+          days_supply: 30,
+          quantity: 3,
+        }.to_json)
       end
+    end
 
+    context "sad path" do
       context "invalid json" do
         it "returns an error" do
           results = described_class.new("asdf").call
