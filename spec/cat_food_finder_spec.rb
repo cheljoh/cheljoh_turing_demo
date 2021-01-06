@@ -3,16 +3,16 @@ require "json"
 
 RSpec.describe CatFoodFinder do
   describe "#call" do
+    let(:json) do
+      {
+        name: "Caia",
+        age: 15,
+        color: "orange"
+      }.to_json
+    end
+
     context "json" do
       context "valid json" do
-        let(:json) do
-          {
-            name: "Caia",
-            age: 15,
-            color: "orange"
-          }.to_json
-        end
-
         it "parses the json" do
           results = described_class.new(json).call
 
