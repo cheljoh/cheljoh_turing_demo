@@ -32,6 +32,54 @@ RSpec.describe CatFoodFinder do
           expect(results).to eq({ error: "invalid json" }.to_json)
         end
       end
+
+      context "api call" do
+        context "non-200" do
+          it "returns an error" do
+            allow(FakeApiCall).to receive(:call).and_return(
+              OpenStruct.new(
+                status: 400,
+                body: {
+                  error: "food not found"
+                }.to_json
+              )
+            )
+
+            results = described_class.new(json).call
+
+            expect(results).to eq({ error: "no food found" }.to_json)
+          end
+        end
+
+        context "bad json" do
+          it "returns an error" do
+            allow(FakeApiCall).to receive(:call).and_return(
+              OpenStruct.new(
+                status: 200,
+                body: "asdada"
+              )
+            )
+
+            results = described_class.new(json).call
+
+            expect(results).to eq({ error: "no food found" }.to_json)
+          end
+        end
+      end
+
+      context "validate input" do
+        it "requires all cat attributes" do
+          json =  {
+            name: "Caia",
+            age: nil,
+            color: "orange"
+          }.to_json
+
+          results = described_class.new(json).call
+
+          expect(results).to eq({ error: "Missing required fields" }.to_json)
+        end
+      end
     end
   end
 end

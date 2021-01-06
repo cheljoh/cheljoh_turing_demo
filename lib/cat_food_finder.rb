@@ -12,11 +12,12 @@ class CatFoodFinder
   end
 
   def call
-    parsed_json = JSON.parse(request, symbolize_names: true)
-    cat = create_cat(parsed_json)
-    api_response = fake_api_call(cat.age)
-    cat_food = parse_api_response(api_response)
-    present_response(cat_food)
+    parse_json(request)
+      .bind { |parsed_json| create_cat(parsed_json) }
+      .bind { |cat| fake_api_call(cat.age) }
+      .bind { |api_response| parse_api_response(api_response) }
+      .bind { |cat_food| present_response(cat_food) }
+      .value_or { |error| return error }
   end
 
   private
@@ -24,38 +25,56 @@ class CatFoodFinder
   attr_accessor :request
 
   def parse_api_response(api_response)
-    parsed_json = JSON.parse(api_response.body, symbolize_names: true)
-    CatFood.new(
-      parsed_json[:food],
-      parsed_json[:days_supply],
-      parsed_json[:quantity]
-    )
+    parse_json(api_response.body)
+      .bind { |parsed_json|
+        Success(
+          CatFood.new(
+            parsed_json[:food],
+            parsed_json[:days_supply],
+            parsed_json[:quantity]
+          )
+        )
+      }
+      .or {
+        Failure({ error: "no food found" }.to_json)
+      }
   end
 
   def present_response(response)
-    {
-      message: "yay you did it!"
-    }.merge(response.to_h).to_json
-  end
-
-  def create_cat(parsed_json)
-    Cat.new(
-      parsed_json[:name],
-      parsed_json[:age],
-      parsed_json[:color]
+    Success(
+      {
+        message: "yay you did it!"
+      }.merge(response.to_h).to_json
     )
   end
 
-  def fake_api_call(_age)
-   FakeApiCall.call
+  def create_cat(parsed_json)
+    Try {
+      Cat.new(
+        name: parsed_json[:name],
+        age: parsed_json[:age],
+        color: parsed_json[:color]
+      )
+    }.to_result
+      .or do
+      Failure({ error: "Missing required fields" }.to_json)
+    end
   end
 
-  def is_valid_json?
-    begin
-      JSON.parse(request)
-      true
-    rescue JSON::ParserError
-      false
+  def fake_api_call(_age)
+    api_response = FakeApiCall.call
+
+    if api_response.status == 200
+      Success(FakeApiCall.call)
+    else
+      Failure({ error: "no food found" }.to_json)
+    end
+  end
+
+  def parse_json(json)
+    Try { JSON.parse(json, symbolize_names: true) }.to_result
+      .or do
+      Failure({ error: "invalid json" }.to_json)
     end
   end
 end
