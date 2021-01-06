@@ -15,8 +15,7 @@ class CatFoodFinder
     cat = create_cat(parsed_json)
     api_response = fake_api_call(cat.age)
     cat_food = parse_api_response(api_response)
-    response = create_response(cat_food, cat)
-    present_response(response)
+    present_response(cat_food)
   end
 
   private
@@ -29,17 +28,6 @@ class CatFoodFinder
       parsed_json[:food],
       parsed_json[:days_supply],
       parsed_json[:quantity]
-    )
-  end
-
-  def create_response(cat_food, cat)
-    CatFoodFinderResponse.new(
-      cat.name,
-      cat.age,
-      cat.color,
-      cat_food.name,
-      cat_food.quantity,
-      cat_food.days_supply
     )
   end
 

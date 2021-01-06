@@ -17,12 +17,9 @@ RSpec.describe CatFoodFinder do
           results = described_class.new(json).call
 
           expect(results).to eq({
-            name: "Caia",
-            age: 15,
-            color: "orange",
-            food: "Yummy Kitty Food",
+            name: "Yummy Kitty Food",
+            days_supply: 30,
             quantity: 3,
-            days_supply: 30
           }.to_json)
         end
       end
