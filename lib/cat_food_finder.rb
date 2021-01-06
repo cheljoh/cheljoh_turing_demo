@@ -1,6 +1,7 @@
 require "cat"
 require "cat_food"
 require "cat_food_finder_response"
+require "fake_api_call"
 require "dry-monads"
 
 class CatFoodFinder
@@ -44,14 +45,7 @@ class CatFoodFinder
   end
 
   def fake_api_call(_age)
-    OpenStruct.new(
-      status: 200,
-      body: {
-        food: "Yummy Kitty Food",
-        quantity: 3,
-        days_supply: 30,
-      }.to_json
-    )
+   FakeApiCall.call
   end
 
   def is_valid_json?

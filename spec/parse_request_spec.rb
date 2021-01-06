@@ -2,7 +2,7 @@ require "cat_food_finder"
 require "json"
 
 RSpec.describe CatFoodFinder do
-  describe "#parse" do
+  describe "#call" do
     context "json" do
       context "valid json" do
         let(:json) do
