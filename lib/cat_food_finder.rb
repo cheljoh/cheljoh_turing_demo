@@ -7,7 +7,8 @@ require "dry-monads"
 class CatFoodFinder
   include Dry::Monads[:try, :maybe, :result]
 
-  def initialize(request)
+  def initialize(request, api_call = FakeApiCall)
+    @api_call = api_call
     @request = request
   end
 
@@ -21,7 +22,7 @@ class CatFoodFinder
 
   private
 
-  attr_accessor :request
+  attr_accessor :request, :api_call
 
   def parse_api_response(api_response)
     parsed_json = JSON.parse(api_response.body, symbolize_names: true)
@@ -47,7 +48,7 @@ class CatFoodFinder
   end
 
   def fake_api_call(_age)
-   FakeApiCall.call
+   api_call.call
   end
 
   def is_valid_json?
